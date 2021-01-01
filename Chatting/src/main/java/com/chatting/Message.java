@@ -29,6 +29,14 @@ public class Message {
 		this.messageDate = messageDate;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getMessage() {
 		return message;
 	}
