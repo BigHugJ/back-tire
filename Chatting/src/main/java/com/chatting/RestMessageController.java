@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MainController {
+public class RestMessageController {
 	
 	private MessageRepository repository;
 	
-	public MainController(MessageRepository repository) {
+	public RestMessageController(MessageRepository repository) {
 		this.repository = repository;
 	}
 	
