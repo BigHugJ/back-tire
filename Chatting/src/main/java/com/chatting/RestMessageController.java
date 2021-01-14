@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestMessageController {
 	
 	private MessageRepository repository;
+	private UserRepository userRepository;
 	
-	public RestMessageController(MessageRepository repository) {
+	public RestMessageController(MessageRepository repository, UserRepository userRepository) {
 		this.repository = repository;
+		this.userRepository = userRepository;
 	}
 	
 	@RequestMapping("/")
@@ -34,12 +36,31 @@ public class RestMessageController {
 	@CrossOrigin
 	@GetMapping("/messages") 
 	public List<Message>  getAllMessage() {
-		return repository.findAll();
+		return (List<Message>) repository.findAll();
 	}
 	
 	@CrossOrigin
-	@PostMapping("/messages") 
+	@PostMapping("/message") 
 	public Long postMessage(@RequestBody Message message) {
 		return repository.save(message).getId();
 	}
+	
+	@CrossOrigin
+	@GetMapping("/users/{id}")
+	public User getUser(@PathVariable Long id) throws Exception {
+		return userRepository.findById(id).orElseThrow(()-> new Exception());
+	}
+	
+	@CrossOrigin
+	@GetMapping("/users")
+	public List<User> getUsers() throws Exception {
+		return (List<User>)userRepository.findAll();
+	}
+	
+	@CrossOrigin
+	@PostMapping("/user") 
+	public Long postUser(@RequestBody User user) {
+		return userRepository.save(user).getId();
+	}
+	
 }

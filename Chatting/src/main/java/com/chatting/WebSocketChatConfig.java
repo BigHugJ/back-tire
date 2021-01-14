@@ -11,7 +11,7 @@ public class WebSocketChatConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		System.out.println("\nRegister STOMP");
-		registry.addEndpoint("/gs-guide-websocket").setAllowedOrigins("*").withSockJS();
+		registry.addEndpoint("/gs-guide-websocket").setAllowedOrigins("http://192.168.2.35:3000").withSockJS();
 	}
 
 	@Override
@@ -19,6 +19,7 @@ public class WebSocketChatConfig implements WebSocketMessageBrokerConfigurer {
 		System.out.println("\nRegister BROKER");
 
 		registry.setApplicationDestinationPrefixes("/app");
+		registry.enableSimpleBroker("/topic");
 //		registry.enableStompBrokerRelay("/topic").setRelayHost("localhost").setRelayPort(61613).setClientLogin("guest")
 //				.setClientPasscode("guest");
 
