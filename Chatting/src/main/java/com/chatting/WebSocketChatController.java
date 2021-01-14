@@ -27,7 +27,7 @@ public class WebSocketChatController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
-	private List<User> currentOnlineUser = new ArrayList<User>();
+	private List<User> currentOnlineUser ;
 	
 	@MessageMapping("/chatSendMessage")
 	//@SendTo("/topic/jj")
@@ -50,7 +50,8 @@ public class WebSocketChatController {
 		
 		System.out.println("coming in a new user");
 		
-
+		currentOnlineUser = null == userRepository.findAll() ? new ArrayList<User>() : userRepository.findAll();
+		 
 		//headerAccessor.getSessionAttributes().put("username", webSocketChatMessage.getSender());
 		Message webSocketChatMessage = new Message();
 		webSocketChatMessage.setMessageSender(user.getName());
