@@ -29,23 +29,35 @@ public class WebSocketChatController {
 	
 	private List<User> currentOnlineUser ;
 	
+	private String channel;
+	
 	@MessageMapping("/chatSendMessage")
 	//@SendTo("/topic/jj")
 	public Message sendMessage(@Payload Message webSocketChatMessage) {
 
 		repository.save(webSocketChatMessage);
 		
-		String chattingPairKey = webSocketChatMessage.getMessageSender() + webSocketChatMessage.getMessageReceiver();
-		if (StringUtils.compareIgnoreCase(webSocketChatMessage.getMessageSender(), webSocketChatMessage.getMessageReceiver()) > 0) {
-			chattingPairKey = webSocketChatMessage.getMessageReceiver() + webSocketChatMessage.getMessageSender();
-		}
-		
-		simpMessagingTemplate.convertAndSend("/topic/jj"+chattingPairKey, webSocketChatMessage);
+		simpMessagingTemplate.convertAndSend("/topic/jj"+channel, webSocketChatMessage);
+		return webSocketChatMessage;
+	}
+
+	@MessageMapping("/chatChannel")
+	//@SendTo("/topic/jj")
+	public Message addChannel(@Payload Message webSocketChatMessage) {
+
+		repository.save(webSocketChatMessage);
+		channel = webSocketChatMessage.getMessage();
+		//webSocketChatMessage.setMessage("channel added");
+		Message channelMessage = new Message();
+		channelMessage.setMessageReceiver(webSocketChatMessage.getMessage());
+		channelMessage.setMessageSender(webSocketChatMessage.getMessageSender());
+		channelMessage.setMessage("chatting");
+		simpMessagingTemplate.convertAndSend("/topic/jj"+webSocketChatMessage.getMessageReceiver(), channelMessage);
 		return webSocketChatMessage;
 	}
 
 	@MessageMapping("/chatNewUser")
-	//@SendTo("/topic/jun")
+	@SendTo("/topic/broadcastUsers")
 	public Message newUser(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
 		
 		System.out.println("coming in a new user");
@@ -66,22 +78,23 @@ public class WebSocketChatController {
 			StringBuilder currentUserNames= new StringBuilder();
 			currentOnlineUser.stream().forEach(u->currentUserNames.append(u.getName()+","));;
 			currentOnlineUser.add(user);
-			if (currentUserNames.length() > 1) {
-				currentUserNames.deleteCharAt(currentUserNames.length()-1);
-				webSocketChatMessage.setMessageReceiver(currentUserNames.toString());
-			}
-			
+//			if (currentUserNames.length() > 1) {
+//				currentUserNames.deleteCharAt(currentUserNames.length()-1);
+//				c
+//			}
+			currentUserNames.append(user.getName());
+			webSocketChatMessage.setMessageReceiver(currentUserNames.toString());
+			webSocketChatMessage.setMessage("added");
+
 			user.setLoginTime(new Date());
 			user.setOnlineStatus("Online");
 			userRepository.save(user);
 			
-			webSocketChatMessage.setMessage("added");
-
 		}
 		
 		System.out.println("end point: " + user.getName());
 
-		simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), webSocketChatMessage);
+		//simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), webSocketChatMessage);
 		
 		return webSocketChatMessage;
 	}
