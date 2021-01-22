@@ -48,7 +48,7 @@ public class RestMessageController {
 	
 	@CrossOrigin
 	@GetMapping("/users/{id}")
-	public User getUser(@PathVariable Long id) throws Exception {
+	public User getUser(@PathVariable Integer id) throws Exception {
 		return userRepository.findById(id).orElseThrow(()-> new Exception());
 	}
 	
@@ -60,13 +60,13 @@ public class RestMessageController {
 	
 	@CrossOrigin
 	@PostMapping("/user") 
-	public Long postUser(@RequestBody User user) {
+	public Integer postUser(@RequestBody User user) {
 		return userRepository.save(user).getId();
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("/users/{id}")
-	public void deleteUser(@PathVariable Long id) throws Exception {
+	public void deleteUser(@PathVariable Integer id) throws Exception {
 		userRepository.deleteById(id);
 	}
 }

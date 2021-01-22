@@ -3,6 +3,7 @@ package com.chatting;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,18 +78,14 @@ public class WebSocketChatController {
 			
 			StringBuilder currentUserNames= new StringBuilder();
 			currentOnlineUser.stream().forEach(u->currentUserNames.append(u.getName()+","));;
-			currentOnlineUser.add(user);
-//			if (currentUserNames.length() > 1) {
-//				currentUserNames.deleteCharAt(currentUserNames.length()-1);
-//				c
-//			}
+
 			currentUserNames.append(user.getName());
 			webSocketChatMessage.setMessageReceiver(currentUserNames.toString());
 			webSocketChatMessage.setMessage("added");
 
 			user.setLoginTime(new Date());
 			user.setOnlineStatus("Online");
-			userRepository.save(user);
+			currentOnlineUser.add(userRepository.save(user));
 			
 		}
 		
@@ -97,6 +94,26 @@ public class WebSocketChatController {
 		//simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), webSocketChatMessage);
 		
 		return webSocketChatMessage;
+	}
+
+	@MessageMapping("/chatDeleteUser")
+	public Message deleteUser(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
+		System.out.println("deleting an user");
+
+		Optional<User> result = currentOnlineUser.stream().filter(u->u.getName().equalsIgnoreCase(user.getName())).findFirst();
+		if (result.isPresent()) {
+			userRepository.deleteById(result.get().getId());
+		}
+		
+		Iterator<User> iter = currentOnlineUser.iterator();
+		while(iter.hasNext()) {
+			User u = (User) iter.next();
+			if (u.getName().equals(user.getName())) {
+				currentOnlineUser.remove(u);
+				break;
+			}
+		}
+		return null;
 	}
 
 }
