@@ -36,7 +36,7 @@ public class WebSocketChatController {
 	//@SendTo("/topic/jj")
 	public Message sendMessage(@Payload Message webSocketChatMessage) {
 
-		repository.save(webSocketChatMessage);
+		//repository.save(webSocketChatMessage);
 		
 		simpMessagingTemplate.convertAndSend("/topic/jj"+channel, webSocketChatMessage);
 		return webSocketChatMessage;
@@ -46,7 +46,7 @@ public class WebSocketChatController {
 	//@SendTo("/topic/jj")
 	public Message addChannel(@Payload Message webSocketChatMessage) {
 
-		repository.save(webSocketChatMessage);
+		//repository.save(webSocketChatMessage);
 		channel = webSocketChatMessage.getMessage();
 		//webSocketChatMessage.setMessage("channel added");
 		Message channelMessage = new Message();
@@ -61,36 +61,33 @@ public class WebSocketChatController {
 	@SendTo("/topic/broadcastUsers")
 	public Message newUser(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
 		
-		System.out.println("coming in a new user");
-		
-		currentOnlineUser = null == userRepository.findAll() ? new ArrayList<User>() : userRepository.findAll();
-		 
+		System.out.println("coming in a new user: " + user.getName());
+				 
 		//headerAccessor.getSessionAttributes().put("username", webSocketChatMessage.getSender());
-		Message webSocketChatMessage = new Message();
-		webSocketChatMessage.setMessageSender(user.getName());
-		
+		currentOnlineUser = null == userRepository.findAll() ? new ArrayList<User>() : userRepository.findAll();
+		StringBuilder currentUserNames= new StringBuilder();
+		currentOnlineUser.stream().forEach(u->currentUserNames.append(u.getName()+","));
+				
 		Optional<User> result = currentOnlineUser.stream().filter(u->u.getName().equalsIgnoreCase(user.getName())).findFirst();
+		String rMsg = "";
 		if (result.isPresent()) {
-			webSocketChatMessage.setMessageReceiver(null);
-			webSocketChatMessage.setMessage("existing");
+			rMsg = "existing";
 		}
-		else {
+		else {					
 			
-			StringBuilder currentUserNames= new StringBuilder();
-			currentOnlineUser.stream().forEach(u->currentUserNames.append(u.getName()+","));;
-
-			currentUserNames.append(user.getName());
-			webSocketChatMessage.setMessageReceiver(currentUserNames.toString());
-			webSocketChatMessage.setMessage("added");
-
 			user.setLoginTime(new Date());
 			user.setOnlineStatus("Online");
-			currentOnlineUser.add(userRepository.save(user));
-			
+			User u = userRepository.save(user);
+			rMsg = String.valueOf(u.getId());
+			currentOnlineUser.add(u);
+			currentUserNames.append(user.getName());
 		}
-		
-		System.out.println("end point: " + user.getName());
-
+		String allUsers = currentUserNames.toString().endsWith(",") ? currentUserNames.deleteCharAt(currentUserNames.length()-1).toString() : currentUserNames.toString();
+		Message webSocketChatMessage = new Message();
+		webSocketChatMessage.setMessageSender(user.getName());
+		webSocketChatMessage.setMessageReceiver(allUsers);
+		webSocketChatMessage.setMessage(rMsg);
+		webSocketChatMessage.setMessageDate(new Date());
 		//simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), webSocketChatMessage);
 		
 		return webSocketChatMessage;

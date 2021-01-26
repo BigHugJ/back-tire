@@ -11,7 +11,7 @@ public class WebSocketChatConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		System.out.println("\nRegister STOMP");
-		registry.addEndpoint("/gs-guide-websocket").setAllowedOrigins("http://192.168.2.35:3000", "http://74.14.164.223:3000").withSockJS();
+		registry.addEndpoint("/gs-guide-websocket").setAllowedOrigins("http://192.168.2.35:3000", "http://192.168.2.27:3000", "http://74.14.164.223:3000").withSockJS();
 
 	}
 
