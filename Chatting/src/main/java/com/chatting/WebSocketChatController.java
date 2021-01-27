@@ -69,6 +69,9 @@ public class WebSocketChatController {
 		currentOnlineUser.stream().forEach(u->currentUserNames.append(u.getName()+","));
 				
 		Optional<User> result = currentOnlineUser.stream().filter(u->u.getName().equalsIgnoreCase(user.getName())).findFirst();
+		
+		Message webSocketChatMessage = new Message();
+		User newUser = null;
 		String rMsg = "";
 		if (result.isPresent()) {
 			rMsg = "existing";
@@ -77,19 +80,19 @@ public class WebSocketChatController {
 			
 			user.setLoginTime(new Date());
 			user.setOnlineStatus("Online");
-			User u = userRepository.save(user);
-			rMsg = String.valueOf(u.getId());
-			currentOnlineUser.add(u);
+			newUser = userRepository.save(user);
+			rMsg = "added";
+			currentOnlineUser.add(newUser);
 			currentUserNames.append(user.getName());
 		}
 		String allUsers = currentUserNames.toString().endsWith(",") ? currentUserNames.deleteCharAt(currentUserNames.length()-1).toString() : currentUserNames.toString();
-		Message webSocketChatMessage = new Message();
 		webSocketChatMessage.setMessageSender(user.getName());
 		webSocketChatMessage.setMessageReceiver(allUsers);
 		webSocketChatMessage.setMessage(rMsg);
 		webSocketChatMessage.setMessageDate(new Date());
-		//simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), webSocketChatMessage);
-		
+		if (!result.isPresent()) {
+			simpMessagingTemplate.convertAndSend("/topic/jj"+user.getName(), newUser);
+		}
 		return webSocketChatMessage;
 	}
 
