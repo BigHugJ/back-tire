@@ -22,9 +22,9 @@ function connect(event) {
 }
 
 function connectionSuccess() {
-	stompClient.subscribe('/topic/javainuse', onMessageReceived);
+	stompClient.subscribe('/topic/jun', onMessageReceived);
 
-	stompClient.send("/app/chat.newUser", {}, JSON.stringify({
+	stompClient.send("/app/chatNewUser", {}, JSON.stringify({
 		sender : name,
 		type : 'newUser'
 	}))
@@ -41,7 +41,7 @@ function sendMessage(event) {
 			type : 'CHAT'
 		};
 
-		stompClient.send("/app/chat.sendMessage", {}, JSON
+		stompClient.send("/app/chatSendMessage", {}, JSON
 				.stringify(chatMessage));
 		document.querySelector('#chatMessage').value = '';
 	}

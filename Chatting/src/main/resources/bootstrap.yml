@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: chatting
+  profiles:
+    active: back
+  cloud:
+    config:
+      uri: http://192.168.2.27:9000

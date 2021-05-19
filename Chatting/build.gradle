@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.0-SNAPSHOT'
+	id 'org.springframework.boot' version '2.4.2'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
 }
@@ -13,13 +13,22 @@ repositories {
 	maven { url 'https://repo.spring.io/milestone' }
 	maven { url 'https://repo.spring.io/snapshot' }
 }
+ext {
+	set('springCloudVersion', "2020.0.1")
+}
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.h2database:h2'
-    
+
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'	
+	implementation 'org.springframework.cloud:spring-cloud-config-client'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'	
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	
 	implementation 'org.webjars:webjars-locator-core'
 	implementation 'org.webjars:sockjs-client:1.0.2'
 	implementation 'org.webjars:stomp-websocket:2.3.3'
@@ -35,11 +44,14 @@ dependencies {
 	//compile group: 'org.springframework', name: 'spring-messaging', version: '4.3.13.RELEASE' //Thanks for using https://jar-download.com 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
-
-
-
-	
+    	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {
