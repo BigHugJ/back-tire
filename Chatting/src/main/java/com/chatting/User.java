@@ -13,6 +13,7 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	private String name;
+	private String password;
 	private String onlineStatus;
 	private Date loginTime;
 	private Date logoffTime;
@@ -60,4 +61,11 @@ public class User {
 		this.logoffTime = logoffTime;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }
